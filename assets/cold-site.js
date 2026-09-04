@@ -218,7 +218,7 @@ const sourceLinks = [
 
 const defaultState = {
   audience: "adult",
-  startDate: "",
+  startWeekday: new Date().getDay(),
   selectedDay: 0,
   selectedSymptoms: [],
   rememberDate: true,
@@ -230,38 +230,24 @@ const defaultState = {
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-function localDateFromInput(value) {
-  if (!value) return null;
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day) return null;
-  return new Date(year, month - 1, day);
+const weekdays = [
+  { short: "Sun", long: "Sunday" },
+  { short: "Mon", long: "Monday" },
+  { short: "Tue", long: "Tuesday" },
+  { short: "Wed", long: "Wednesday" },
+  { short: "Thu", long: "Thursday" },
+  { short: "Fri", long: "Friday" },
+  { short: "Sat", long: "Saturday" },
+];
+
+function normalizeWeekday(value) {
+  const day = Number(value);
+  return Number.isInteger(day) && day >= 0 && day <= 6 ? day : new Date().getDay();
 }
 
-function dateInputValue(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function addDays(date, days) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
-function diffDays(a, b) {
-  const start = new Date(a.getFullYear(), a.getMonth(), a.getDate());
-  const end = new Date(b.getFullYear(), b.getMonth(), b.getDate());
-  return Math.round((start - end) / 86400000);
-}
-
-function formatDate(date) {
-  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(date);
-}
-
-function formatLongDate(date) {
-  return new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric" }).format(date);
+function weekdayForDay(startWeekday, dayOffset) {
+  const index = (normalizeWeekday(startWeekday) + dayOffset + 14) % 7;
+  return weekdays[index];
 }
 
 function dayLabel(day) {
@@ -272,7 +258,14 @@ function dayLabel(day) {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    return { ...defaultState, ...saved };
+    const state = { ...defaultState, ...saved };
+    if (!Object.prototype.hasOwnProperty.call(saved, "startWeekday") && state.startDate) {
+      const parsed = new Date(`${state.startDate}T00:00:00`);
+      if (!Number.isNaN(parsed.getTime())) state.startWeekday = parsed.getDay();
+    }
+    state.startWeekday = normalizeWeekday(state.startWeekday);
+    delete state.startDate;
+    return state;
   } catch {
     return { ...defaultState };
   }
@@ -280,42 +273,26 @@ function loadState() {
 
 function saveState(state) {
   const toSave = { ...state };
-  if (!toSave.rememberDate) toSave.startDate = "";
+  if (!toSave.rememberDate) delete toSave.startWeekday;
+  delete toSave.startDate;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-}
-
-function pickInitialDate(state) {
-  if (state.startDate) return state.startDate;
-  return dateInputValue(new Date());
 }
 
 function renderColdSite() {
   const state = loadState();
-  if (!state.startDate) {
-    state.startDate = pickInitialDate(state);
-    state.selectedDay = 0;
-  }
+  state.startWeekday = normalizeWeekday(state.startWeekday);
 
   const timeline = $("[data-timeline]");
   const detail = $("[data-detail]");
   const medList = $("[data-med-list]");
   const symptomGrid = $("[data-symptom-grid]");
-  const startDateInput = $("[data-start-date]");
+  const startDayInput = $("[data-start-day]");
   const sourceSection = $("[data-sources]");
   const selectedDayLabel = $("[data-selected-day]");
   const audienceLabel = $("[data-audience-label]");
   const resetButton = $("[data-reset-site]");
 
-  if (startDateInput) startDateInput.value = state.startDate;
-
-  function getStartDate() {
-    return localDateFromInput(state.startDate);
-  }
-
-  function dateForDay(day) {
-    const start = getStartDate();
-    return start ? addDays(start, day) : null;
-  }
+  if (startDayInput) startDayInput.value = String(state.startWeekday);
 
   function activePhase() {
     return phases.find((phase) => phase.day === state.selectedDay) || phases[2];
@@ -339,13 +316,12 @@ function renderColdSite() {
   function renderTimeline() {
     if (!timeline) return;
     timeline.innerHTML = phases.map((phase) => {
-      const date = dateForDay(phase.day);
+      const weekday = weekdayForDay(state.startWeekday, phase.day);
       const isSelected = phase.day === state.selectedDay;
-      const dateText = date ? formatDate(date) : "";
       return `
         <button class="phase-tile ${isSelected ? "is-selected" : ""}" type="button" data-day="${phase.day}" aria-pressed="${isSelected}">
           <span class="phase-day">${dayLabel(phase.day)}</span>
-          <span class="phase-date">${dateText}</span>
+          <span class="phase-date">${weekday.short}</span>
           <span class="phase-name">${phase.name}</span>
           <span class="phase-short">${phase.short}</span>
           <span class="phase-meter" aria-hidden="true"><span style="width: ${phase.severity}%"></span></span>
@@ -357,12 +333,12 @@ function renderColdSite() {
   function renderDetail() {
     if (!detail) return;
     const phase = activePhase();
-    const date = dateForDay(phase.day);
+    const weekday = weekdayForDay(state.startWeekday, phase.day);
     const guide = phase[state.audience];
     detail.innerHTML = `
       <div class="detail-heading">
         <div>
-          <p class="eyebrow">${dayLabel(phase.day)}${date ? ` · ${formatLongDate(date)}` : ""}</p>
+          <p class="eyebrow">${dayLabel(phase.day)} · ${weekday.long}</p>
           <h2>${phase.name}</h2>
         </div>
         <span class="detail-pill">${phase.short}</span>
@@ -380,7 +356,7 @@ function renderColdSite() {
       </div>
     `;
     if (selectedDayLabel) {
-      selectedDayLabel.textContent = date ? `${dayLabel(phase.day)} · ${formatDate(date)}` : dayLabel(phase.day);
+      selectedDayLabel.textContent = `${dayLabel(phase.day)} · ${weekday.short}`;
     }
   }
 
@@ -422,11 +398,11 @@ function renderColdSite() {
   function renderSettingsSummary() {
     const summary = $("[data-settings-summary]");
     if (!summary) return;
-    const date = getStartDate();
+    const weekday = weekdays[normalizeWeekday(state.startWeekday)];
     summary.innerHTML = `
       <div><span>Audience</span><strong>${state.audience === "adult" ? "Adults" : "Kids"}</strong></div>
-      <div><span>Sore throat started</span><strong>${date ? formatLongDate(date) : "Not set"}</strong></div>
-      <div><span>Saved date</span><strong>${state.rememberDate ? "On" : "Off"}</strong></div>
+      <div><span>Sore throat started</span><strong>${weekday.long}</strong></div>
+      <div><span>Saved weekday</span><strong>${state.rememberDate ? "On" : "Off"}</strong></div>
     `;
   }
 
@@ -483,13 +459,13 @@ function renderColdSite() {
     }
 
     if (event.target.closest("[data-reset-settings]")) {
-      Object.assign(state, { ...defaultState, startDate: dateInputValue(new Date()) });
+      Object.assign(state, { ...defaultState, startWeekday: new Date().getDay() });
       renderAll();
       return;
     }
 
     if (event.target.closest("[data-reset-site]")) {
-      Object.assign(state, { ...defaultState, startDate: dateInputValue(new Date()) });
+      Object.assign(state, { ...defaultState, startWeekday: new Date().getDay() });
       renderAll();
     }
   });
@@ -503,11 +479,9 @@ function renderColdSite() {
     });
   }
 
-  if (startDateInput) {
-    startDateInput.addEventListener("change", () => {
-      state.startDate = startDateInput.value;
-      const todayOffset = getStartDate() ? diffDays(new Date(), getStartDate()) : 0;
-      state.selectedDay = Math.max(-2, Math.min(10, todayOffset));
+  if (startDayInput) {
+    startDayInput.addEventListener("change", () => {
+      state.startWeekday = normalizeWeekday(startDayInput.value);
       renderAll();
     });
   }

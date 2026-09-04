@@ -2,13 +2,17 @@
 
 **Live site:** [https://talrme.github.io/colds/](https://talrme.github.io/colds/)
 
-Five staging concepts for a small cold timeline website.
+A small, playful cold timeline website using the Symptom Subway concept.
 
-- Root page: staging chooser for the five concepts
-- `staging_1`: Cozy Forecast
-- `staging_2`: Symptom Subway
-- `staging_3`: Medicine Cabinet
-- `staging_4`: Sick Day Radio
-- `staging_5`: Quiet Clinical
+## What It Does
 
-Each version includes the local "Colds Last for a Week" audio file from the music site, adult/kid guidance, a sore-throat-start date input, settings, and links to CDC/FDA/AAP sources.
+- Shows an approximate cold timeline from `Day -2` through `Day +10`
+- Lets you choose the weekday when the sore throat started
+- Switches between adult and kid guidance
+- Filters medication suggestions by symptom and emphasizes active ingredients
+- Includes a settings modal for saved weekday, compact map, source links, and motion
+- Includes the local "Colds Last for a Week" song from the music site, without autoplay
+
+## Source Notes
+
+Cold timing and medication caution copy is based on CDC, FDA, and HealthyChildren/AAP public guidance. This site is a comfort/planning reference, not medical advice.
