@@ -1,4 +1,4 @@
-const STORAGE_KEY = "tal-colds-site-v1";
+const STORAGE_KEY = "tal-colds-site-v2";
 
 const symptoms = [
   { id: "throat", label: "Sore throat" },
@@ -218,7 +218,7 @@ const sourceLinks = [
 
 const defaultState = {
   audience: "adult",
-  startWeekday: new Date().getDay(),
+  startWeekday: null,
   selectedDay: 0,
   selectedSymptoms: [],
   rememberDate: true,
@@ -241,12 +241,15 @@ const weekdays = [
 ];
 
 function normalizeWeekday(value) {
+  if (value === null || value === undefined || value === "") return null;
   const day = Number(value);
-  return Number.isInteger(day) && day >= 0 && day <= 6 ? day : new Date().getDay();
+  return Number.isInteger(day) && day >= 0 && day <= 6 ? day : null;
 }
 
 function weekdayForDay(startWeekday, dayOffset) {
-  const index = (normalizeWeekday(startWeekday) + dayOffset + 14) % 7;
+  const normalized = normalizeWeekday(startWeekday);
+  if (normalized === null) return null;
+  const index = (normalized + dayOffset + 14) % 7;
   return weekdays[index];
 }
 
@@ -286,13 +289,12 @@ function renderColdSite() {
   const detail = $("[data-detail]");
   const medList = $("[data-med-list]");
   const symptomGrid = $("[data-symptom-grid]");
-  const startDayInput = $("[data-start-day]");
+  const dayPicker = $("[data-day-picker]");
+  const dayPickerButton = $("[data-open-day-picker]");
   const sourceSection = $("[data-sources]");
   const selectedDayLabel = $("[data-selected-day]");
   const audienceLabel = $("[data-audience-label]");
   const resetButton = $("[data-reset-site]");
-
-  if (startDayInput) startDayInput.value = String(state.startWeekday);
 
   function activePhase() {
     return phases.find((phase) => phase.day === state.selectedDay) || phases[2];
@@ -300,6 +302,7 @@ function renderColdSite() {
 
   function updateBody() {
     document.body.dataset.audience = state.audience;
+    document.body.classList.toggle("has-start-day", state.startWeekday !== null);
     document.body.classList.toggle("is-compact", state.compactMode);
     document.body.classList.toggle("reduce-motion", state.reduceMotion);
     if (sourceSection) sourceSection.hidden = !state.showSources;
@@ -309,6 +312,11 @@ function renderColdSite() {
     });
     $$("[data-setting]").forEach((input) => {
       if (input.type === "checkbox") input.checked = Boolean(state[input.dataset.setting]);
+    });
+    $$("[data-start-day-value]").forEach((button) => {
+      const isActive = Number(button.dataset.startDayValue) === state.startWeekday;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
     });
     if (audienceLabel) audienceLabel.textContent = state.audience === "adult" ? "Adult guidance" : "Kid guidance";
   }
@@ -321,7 +329,7 @@ function renderColdSite() {
       return `
         <button class="phase-tile ${isSelected ? "is-selected" : ""}" type="button" data-day="${phase.day}" aria-pressed="${isSelected}">
           <span class="phase-day">${dayLabel(phase.day)}</span>
-          <span class="phase-date">${weekday.short}</span>
+          <span class="phase-date">${weekday ? weekday.short : ""}</span>
           <span class="phase-name">${phase.name}</span>
           <span class="phase-short">${phase.short}</span>
           <span class="phase-meter" aria-hidden="true"><span style="width: ${phase.severity}%"></span></span>
@@ -338,7 +346,7 @@ function renderColdSite() {
     detail.innerHTML = `
       <div class="detail-heading">
         <div>
-          <p class="eyebrow">${dayLabel(phase.day)} · ${weekday.long}</p>
+          <p class="eyebrow">${dayLabel(phase.day)}${weekday ? ` · ${weekday.long}` : ""}</p>
           <h2>${phase.name}</h2>
         </div>
         <span class="detail-pill">${phase.short}</span>
@@ -356,7 +364,14 @@ function renderColdSite() {
       </div>
     `;
     if (selectedDayLabel) {
-      selectedDayLabel.textContent = `${dayLabel(phase.day)} · ${weekday.short}`;
+      selectedDayLabel.textContent = state.startWeekday === null
+        ? "Select day"
+        : `Day 0: ${weekdays[state.startWeekday].short}`;
+    }
+    if (dayPickerButton) {
+      dayPickerButton.setAttribute("aria-label", state.startWeekday === null
+        ? "Select the weekday when sore throat started"
+        : `Sore throat started on ${weekdays[state.startWeekday].long}. Edit weekday.`);
     }
   }
 
@@ -398,10 +413,10 @@ function renderColdSite() {
   function renderSettingsSummary() {
     const summary = $("[data-settings-summary]");
     if (!summary) return;
-    const weekday = weekdays[normalizeWeekday(state.startWeekday)];
+    const weekday = state.startWeekday === null ? null : weekdays[state.startWeekday];
     summary.innerHTML = `
       <div><span>Audience</span><strong>${state.audience === "adult" ? "Adults" : "Kids"}</strong></div>
-      <div><span>Sore throat started</span><strong>${weekday.long}</strong></div>
+      <div><span>Sore throat started</span><strong>${weekday ? weekday.long : "Not selected"}</strong></div>
       <div><span>Saved weekday</span><strong>${state.rememberDate ? "On" : "Off"}</strong></div>
     `;
   }
@@ -418,6 +433,19 @@ function renderColdSite() {
     scrollSelectedPhaseIntoView();
   }
 
+  function closeDayPicker() {
+    if (!dayPicker || !dayPickerButton) return;
+    dayPicker.hidden = true;
+    dayPickerButton.setAttribute("aria-expanded", "false");
+  }
+
+  function toggleDayPicker() {
+    if (!dayPicker || !dayPickerButton) return;
+    const shouldOpen = dayPicker.hidden;
+    dayPicker.hidden = !shouldOpen;
+    dayPickerButton.setAttribute("aria-expanded", String(shouldOpen));
+  }
+
   function scrollSelectedPhaseIntoView() {
     if (!timeline || window.matchMedia("(min-width: 821px)").matches) return;
     const selected = timeline.querySelector(".phase-tile.is-selected");
@@ -432,6 +460,24 @@ function renderColdSite() {
   }
 
   document.addEventListener("click", (event) => {
+    const dayPickerTrigger = event.target.closest("[data-open-day-picker]");
+    if (dayPickerTrigger) {
+      toggleDayPicker();
+      return;
+    }
+
+    const dayOption = event.target.closest("[data-start-day-value]");
+    if (dayOption) {
+      state.startWeekday = normalizeWeekday(dayOption.dataset.startDayValue);
+      closeDayPicker();
+      renderAll();
+      return;
+    }
+
+    if (!event.target.closest("[data-day-picker-wrap]")) {
+      closeDayPicker();
+    }
+
     const phaseButton = event.target.closest("[data-day]");
     if (phaseButton) {
       state.selectedDay = Number(phaseButton.dataset.day);
@@ -473,13 +519,15 @@ function renderColdSite() {
     }
 
     if (event.target.closest("[data-reset-settings]")) {
-      Object.assign(state, { ...defaultState, startWeekday: new Date().getDay() });
+      Object.assign(state, { ...defaultState, startWeekday: null });
+      closeDayPicker();
       renderAll();
       return;
     }
 
     if (event.target.closest("[data-reset-site]")) {
-      Object.assign(state, { ...defaultState, startWeekday: new Date().getDay() });
+      Object.assign(state, { ...defaultState, startWeekday: null });
+      closeDayPicker();
       renderAll();
     }
   });
@@ -490,13 +538,6 @@ function renderColdSite() {
         event.preventDefault();
         resetButton.click();
       }
-    });
-  }
-
-  if (startDayInput) {
-    startDayInput.addEventListener("change", () => {
-      state.startWeekday = normalizeWeekday(startDayInput.value);
-      renderAll();
     });
   }
 
@@ -529,7 +570,10 @@ function renderColdSite() {
   }
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeSettings();
+    if (event.key === "Escape") {
+      closeDayPicker();
+      closeSettings();
+    }
   });
 
   setupAudio();

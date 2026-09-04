@@ -14,25 +14,9 @@
         <span>Symptom Route</span>
         <strong>Colds Last for a Week</strong>
       </button>
-      <section class="route-control" aria-label="Route controls">
-        <label>
-          <span>Sore throat started on</span>
-          <select data-start-day aria-label="Day sore throat started">
-            <option value="0">Sunday</option>
-            <option value="1">Monday</option>
-            <option value="2">Tuesday</option>
-            <option value="3">Wednesday</option>
-            <option value="4">Thursday</option>
-            <option value="5">Friday</option>
-            <option value="6">Saturday</option>
-          </select>
-        </label>
-        <div class="toggle-row" data-audience-toggle>
-          <button type="button" data-audience-value="adult">Adults</button>
-          <button type="button" data-audience-value="kid">Kids</button>
-        </div>
-        <button type="button" class="settings-trigger" data-open-settings>Settings</button>
-      </section>
+      <button type="button" class="settings-icon-button" data-open-settings aria-label="Open settings" title="Settings">
+        <span class="settings-glyph" aria-hidden="true"></span>
+      </button>
     </header>
 
     <section class="song-strip" aria-label="Colds Last for a Week song">
@@ -53,7 +37,30 @@
           <p class="eyebrow" data-audience-label>Adult guidance</p>
           <h1>Ride the cold line</h1>
         </div>
-        <p data-selected-day>Day 0</p>
+        <div class="timeline-tools">
+          <div class="audience-toggle" data-audience-toggle aria-label="Audience guidance">
+            <button type="button" data-audience-value="adult">Adults</button>
+            <button type="button" data-audience-value="kid">Kids</button>
+          </div>
+          <div class="day-picker-wrap" data-day-picker-wrap>
+            <button type="button" class="day-picker-pill" data-open-day-picker aria-haspopup="true" aria-expanded="false">
+              <span data-selected-day>Select day</span>
+              <span class="pill-edit">Edit</span>
+            </button>
+            <div class="day-popover" data-day-picker hidden>
+              <p>Sore throat started on</p>
+              <div class="weekday-grid">
+                <button type="button" data-start-day-value="0">Sun</button>
+                <button type="button" data-start-day-value="1">Mon</button>
+                <button type="button" data-start-day-value="2">Tue</button>
+                <button type="button" data-start-day-value="3">Wed</button>
+                <button type="button" data-start-day-value="4">Thu</button>
+                <button type="button" data-start-day-value="5">Fri</button>
+                <button type="button" data-start-day-value="6">Sat</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="timeline" data-timeline></div>
     </section>

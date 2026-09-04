@@ -50,13 +50,13 @@ img { display: block; max-width: 100%; }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: stretch;
+  position: relative;
 }
 
 .title-button,
-.route-control,
 .song-strip,
 .map-section,
 .detail-panel,
@@ -71,7 +71,7 @@ img { display: block; max-width: 100%; }
 
 .title-button {
   min-height: 210px;
-  padding: 24px;
+  padding: 24px 74px 24px 24px;
   text-align: left;
   overflow: hidden;
 }
@@ -92,71 +92,101 @@ img { display: block; max-width: 100%; }
   line-height: 0.9;
 }
 
-.route-control {
-  min-width: 330px;
-  padding: 16px;
+.settings-icon-button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
   display: grid;
-  align-content: center;
-  gap: 12px;
-}
-.route-control label {
-  display: grid;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-.route-control input,
-.route-control select {
-  min-height: 46px;
-  border: 2px solid var(--line);
-  border-radius: 8px;
-  padding: 9px 11px;
-  font-weight: 900;
-  background: #fff;
-}
-.route-control select {
-  appearance: none;
-  background:
-    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
-    linear-gradient(135deg, var(--ink) 50%, transparent 50%),
-    #fff;
-  background-position:
-    calc(100% - 18px) 50%,
-    calc(100% - 12px) 50%,
-    0 0;
-  background-size:
-    6px 6px,
-    6px 6px,
-    100%;
-  background-repeat: no-repeat;
-  padding-right: 34px;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 3px 3px 0 rgba(21, 25, 31, 0.08);
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
-.toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.toggle-row button,
-[data-open-settings],
+.settings-icon-button:hover {
+  transform: rotate(18deg) translateY(-1px);
+  background: #fff;
+  box-shadow: 4px 4px 0 rgba(21, 25, 31, 0.16);
+}
+
+.settings-glyph {
+  width: 21px;
+  height: 15px;
+  position: relative;
+  display: block;
+  border-top: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+
+.settings-glyph::before,
+.settings-glyph::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.settings-glyph::before {
+  left: 2px;
+  top: -5px;
+}
+
+.settings-glyph::after {
+  right: 2px;
+  bottom: -5px;
+}
+
+.audience-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.audience-toggle button,
 [data-audio-play],
 [data-clear-symptoms],
-[data-reset-settings] {
-  min-height: 44px;
+[data-reset-settings],
+.day-picker-pill,
+.weekday-grid button {
+  min-height: 40px;
   border: 2px solid var(--ink);
   border-radius: 8px;
   background: #fff;
   font-weight: 950;
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
-.toggle-row button:hover,
-[data-open-settings]:hover,
+.audience-toggle button:hover,
 [data-audio-play]:hover,
 [data-clear-symptoms]:hover,
-[data-reset-settings]:hover {
+[data-reset-settings]:hover,
+.day-picker-pill:hover,
+.weekday-grid button:hover {
   transform: translate(-1px, -1px);
   box-shadow: 4px 4px 0 rgba(21, 25, 31, 0.16);
 }
-.toggle-row button.is-active { background: var(--blue); color: #fff; }
-[data-open-settings] { background: var(--ink); color: #fff; }
+.audience-toggle button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.audience-toggle button.is-active {
+  background: var(--blue);
+  color: #fff;
+}
 
 .song-strip {
   display: grid;
@@ -194,7 +224,6 @@ img { display: block; max-width: 100%; }
 h1, h2, h3, p { overflow-wrap: anywhere; }
 h1, h2, h3 { margin: 0; line-height: 0.98; }
 h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
-.section-heading > p,
 .detail-pill {
   margin: 0;
   border: 2px solid var(--ink);
@@ -203,6 +232,97 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
   padding: 8px 12px;
   font-weight: 950;
   white-space: nowrap;
+}
+
+.timeline-tools {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.day-picker-wrap {
+  position: relative;
+}
+
+.day-picker-pill {
+  min-width: 122px;
+  padding: 0 10px 0 13px;
+  border-radius: 999px;
+  background: var(--yellow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.pill-edit {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  color: rgba(21, 25, 31, 0.72);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  transition: max-width 180ms ease, opacity 180ms ease;
+}
+
+.day-picker-pill:hover .pill-edit,
+.day-picker-pill:focus-visible .pill-edit,
+body:not(.has-start-day) .pill-edit {
+  max-width: 40px;
+  opacity: 1;
+}
+
+body:not(.has-start-day) .day-picker-pill {
+  animation: day-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes day-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 190, 85, 0.42); }
+  50% { box-shadow: 0 0 0 7px rgba(244, 190, 85, 0.08); }
+}
+
+.day-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 12;
+  width: 238px;
+  padding: 10px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 6px 6px 0 rgba(21, 25, 31, 0.16);
+}
+
+.day-popover p {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.weekday-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.weekday-grid button {
+  min-height: 38px;
+  padding: 0;
+  border-color: var(--line);
+  font-weight: 950;
+}
+
+.weekday-grid button.is-active {
+  border-color: var(--ink);
+  background: var(--blue);
+  color: #fff;
 }
 
 .timeline {
@@ -261,6 +381,7 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
 }
 .phase-day { display: block; font-weight: 950; }
 .phase-date { display: block; color: var(--red); font-weight: 900; }
+body:not(.has-start-day) .phase-date { display: none; }
 .phase-name { display: block; margin-top: 7px; font-weight: 950; line-height: 1.05; }
 .phase-short { display: block; margin-top: 5px; color: var(--muted); font-size: 0.88rem; line-height: 1.25; }
 .phase-meter { display: none; }
@@ -361,13 +482,9 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
     gap: 10px;
   }
 
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
+  .hero { grid-template-columns: 1fr; }
 
   .title-button,
-  .route-control,
   .song-strip,
   .map-section,
   .detail-panel,
@@ -379,7 +496,7 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
 
   .title-button {
     min-height: 142px;
-    padding: 16px;
+    padding: 16px 58px 16px 16px;
   }
 
   .title-button span {
@@ -393,32 +510,21 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
     line-height: 0.86;
   }
 
-  .route-control {
-    min-width: 0;
-    padding: 12px;
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .settings-icon-button {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    border-width: 1.5px;
   }
 
-  .route-control label {
-    font-size: 0.68rem;
-  }
-
-  .route-control select {
-    min-height: 50px;
-    font-size: 1.08rem;
-  }
-
-  .toggle-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-  }
-
-  .toggle-row button,
-  [data-open-settings],
+  .audience-toggle button,
   [data-audio-play],
   [data-clear-symptoms],
-  [data-reset-settings] {
+  [data-reset-settings],
+  .day-picker-pill,
+  .weekday-grid button {
     min-height: 46px;
     border-width: 1.5px;
   }
@@ -476,11 +582,47 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
     font-size: clamp(1.6rem, 8vw, 2.4rem);
   }
 
-  .section-heading > p,
   .detail-pill {
     width: fit-content;
     padding: 7px 10px;
     border-width: 1.5px;
+  }
+
+  .timeline-tools {
+    justify-content: stretch;
+    gap: 8px;
+  }
+
+  .audience-toggle {
+    order: 2;
+    width: 100%;
+    border-width: 1.5px;
+  }
+
+  .audience-toggle button {
+    flex: 1;
+    padding: 0 10px;
+  }
+
+  .day-picker-wrap {
+    order: 1;
+    width: 100%;
+  }
+
+  .day-picker-pill {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .day-popover {
+    left: 0;
+    right: 0;
+    width: 100%;
+    box-shadow: 4px 4px 0 rgba(21, 25, 31, 0.16);
+  }
+
+  .weekday-grid {
+    grid-template-columns: repeat(7, 1fr);
   }
 
   .timeline {
