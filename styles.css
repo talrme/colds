@@ -386,6 +386,52 @@ body:not(.has-start-day) .phase-date { display: none; }
 .phase-short { display: block; margin-top: 5px; color: var(--muted); font-size: 0.88rem; line-height: 1.25; }
 .phase-meter { display: none; }
 
+.detail-panel {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 20px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.day-detail-card {
+  flex: 0 0 100%;
+  min-width: 0;
+  position: relative;
+  padding: 2px 0 4px;
+  scroll-snap-align: start;
+}
+
+.day-detail-card + .day-detail-card {
+  padding-top: 2px;
+}
+
+.day-detail-card.is-selected {
+  padding: 12px 12px 14px;
+  border-radius: 8px;
+  background: #fffdf3;
+  box-shadow: inset 0 0 0 2px rgba(245, 197, 66, 0.62);
+}
+
+.day-detail-card.is-selected::before {
+  content: "";
+  position: absolute;
+  inset: 14px auto 14px 0;
+  width: 5px;
+  border-radius: 999px;
+  background: var(--red);
+}
+
+.day-detail-card.is-selected .detail-heading,
+.day-detail-card.is-selected .detail-note,
+.day-detail-card.is-selected .detail-grid {
+  margin-left: 10px;
+}
+
 .detail-note { color: var(--muted); line-height: 1.55; font-size: 1.05rem; }
 .detail-grid,
 .med-list {
@@ -673,6 +719,24 @@ body:not(.has-start-day) .phase-date { display: none; }
 
   .detail-note {
     font-size: 0.98rem;
+  }
+
+  .detail-panel {
+    gap: 10px;
+    scroll-padding-inline: 14px;
+  }
+
+  .day-detail-card {
+    flex-basis: 100%;
+    padding-bottom: 2px;
+  }
+
+  .day-detail-card + .day-detail-card {
+    padding-top: 2px;
+  }
+
+  .day-detail-card.is-selected {
+    padding: 10px 10px 12px;
   }
 
   .detail-grid,

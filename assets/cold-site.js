@@ -284,6 +284,8 @@ function saveState(state) {
 function renderColdSite() {
   const state = loadState();
   state.startWeekday = normalizeWeekday(state.startWeekday);
+  let detailScrollFrame = null;
+  let suppressDetailSyncUntil = 0;
 
   const timeline = $("[data-timeline]");
   const detail = $("[data-detail]");
@@ -295,10 +297,6 @@ function renderColdSite() {
   const selectedDayLabel = $("[data-selected-day]");
   const audienceLabel = $("[data-audience-label]");
   const resetButton = $("[data-reset-site]");
-
-  function activePhase() {
-    return phases.find((phase) => phase.day === state.selectedDay) || phases[2];
-  }
 
   function updateBody() {
     document.body.dataset.audience = state.audience;
@@ -338,31 +336,7 @@ function renderColdSite() {
     }).join("");
   }
 
-  function renderDetail() {
-    if (!detail) return;
-    const phase = activePhase();
-    const weekday = weekdayForDay(state.startWeekday, phase.day);
-    const guide = phase[state.audience];
-    detail.innerHTML = `
-      <div class="detail-heading">
-        <div>
-          <p class="eyebrow">${dayLabel(phase.day)}${weekday ? ` · ${weekday.long}` : ""}</p>
-          <h2>${phase.name}</h2>
-        </div>
-        <span class="detail-pill">${phase.short}</span>
-      </div>
-      <p class="detail-note">${phase.notes}</p>
-      <div class="detail-grid">
-        <section>
-          <h3>Likely symptoms</h3>
-          <ul>${phase.symptoms.map((item) => `<li>${item}</li>`).join("")}</ul>
-        </section>
-        <section>
-          <h3>What may help</h3>
-          <ul>${guide.map((item) => `<li>${item}</li>`).join("")}</ul>
-        </section>
-      </div>
-    `;
+  function renderDayPickerLabel() {
     if (selectedDayLabel) {
       selectedDayLabel.textContent = state.startWeekday === null
         ? "Select day"
@@ -373,6 +347,38 @@ function renderColdSite() {
         ? "Select the weekday when sore throat started"
         : `Sore throat started on ${weekdays[state.startWeekday].long}. Edit weekday.`);
     }
+  }
+
+  function renderDetails() {
+    if (!detail) return;
+    detail.innerHTML = phases.map((phase) => {
+      const weekday = weekdayForDay(state.startWeekday, phase.day);
+      const guide = phase[state.audience];
+      const isSelected = phase.day === state.selectedDay;
+      return `
+        <article class="day-detail-card ${isSelected ? "is-selected" : ""}" data-detail-day="${phase.day}" aria-current="${isSelected ? "true" : "false"}">
+          <div class="detail-heading">
+            <div>
+              <p class="eyebrow">${dayLabel(phase.day)}${weekday ? ` · ${weekday.long}` : ""}</p>
+              <h2>${phase.name}</h2>
+            </div>
+            <span class="detail-pill">${phase.short}</span>
+          </div>
+          <p class="detail-note">${phase.notes}</p>
+          <div class="detail-grid">
+            <section>
+              <h3>Likely symptoms</h3>
+              <ul>${phase.symptoms.map((item) => `<li>${item}</li>`).join("")}</ul>
+            </section>
+            <section>
+              <h3>What may help</h3>
+              <ul>${guide.map((item) => `<li>${item}</li>`).join("")}</ul>
+            </section>
+          </div>
+        </article>
+      `;
+    }).join("");
+    renderDayPickerLabel();
   }
 
   function renderSymptoms() {
@@ -421,16 +427,16 @@ function renderColdSite() {
     `;
   }
 
-  function renderAll() {
+  function renderAll({ scrollDetail = true, scrollTimeline = true } = {}) {
     updateBody();
     renderTimeline();
-    renderDetail();
+    renderDetails();
     renderSymptoms();
     renderMeds();
     renderSources();
     renderSettingsSummary();
     saveState(state);
-    scrollSelectedPhaseIntoView();
+    updateSelectedDayUi({ scrollTimeline, scrollDetail, save: false });
   }
 
   function closeDayPicker() {
@@ -447,7 +453,7 @@ function renderColdSite() {
   }
 
   function scrollSelectedPhaseIntoView() {
-    if (!timeline || window.matchMedia("(min-width: 821px)").matches) return;
+    if (!timeline) return;
     const selected = timeline.querySelector(".phase-tile.is-selected");
     if (!selected) return;
     window.requestAnimationFrame(() => {
@@ -456,6 +462,69 @@ function renderColdSite() {
         left: Math.max(0, targetLeft),
         behavior: state.reduceMotion ? "auto" : "smooth",
       });
+    });
+  }
+
+  function scrollSelectedDetailIntoView() {
+    if (!detail) return;
+    const selected = $$("[data-detail-day]", detail).find((card) => Number(card.dataset.detailDay) === state.selectedDay);
+    if (!selected) return;
+    const panelRect = detail.getBoundingClientRect();
+    const cardRect = selected.getBoundingClientRect();
+    const panelStyle = getComputedStyle(detail);
+    const leftPadding = Number.parseFloat(panelStyle.paddingLeft) || 0;
+    const targetLeft = detail.scrollLeft + cardRect.left - panelRect.left - leftPadding;
+    suppressDetailSyncUntil = performance.now() + 550;
+    detail.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: state.reduceMotion ? "auto" : "smooth",
+    });
+  }
+
+  function updateSelectedDayUi({ scrollTimeline = false, scrollDetail = false, save = true } = {}) {
+    $$("[data-day]").forEach((button) => {
+      const isSelected = Number(button.dataset.day) === state.selectedDay;
+      button.classList.toggle("is-selected", isSelected);
+      button.setAttribute("aria-pressed", String(isSelected));
+    });
+    $$("[data-detail-day]").forEach((card) => {
+      const isSelected = Number(card.dataset.detailDay) === state.selectedDay;
+      card.classList.toggle("is-selected", isSelected);
+      card.setAttribute("aria-current", String(isSelected));
+    });
+    if (save) saveState(state);
+    if (scrollTimeline) scrollSelectedPhaseIntoView();
+    if (scrollDetail) scrollSelectedDetailIntoView();
+  }
+
+  function dayFromDetailScroll() {
+    if (!detail) return null;
+    const cards = $$("[data-detail-day]", detail);
+    const panelRect = detail.getBoundingClientRect();
+    const focusX = panelRect.left + panelRect.width / 2;
+    let bestDay = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    cards.forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      if (rect.right < panelRect.left + 24 || rect.left > panelRect.right - 24) return;
+      const cardFocusX = rect.left + rect.width / 2;
+      const distance = Math.abs(cardFocusX - focusX);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestDay = Number(card.dataset.detailDay);
+      }
+    });
+    return bestDay;
+  }
+
+  function handleDetailScroll() {
+    if (performance.now() < suppressDetailSyncUntil || detailScrollFrame) return;
+    detailScrollFrame = window.requestAnimationFrame(() => {
+      detailScrollFrame = null;
+      const day = dayFromDetailScroll();
+      if (day === null || day === state.selectedDay) return;
+      state.selectedDay = day;
+      updateSelectedDayUi({ scrollTimeline: true, save: true });
     });
   }
 
@@ -470,7 +539,7 @@ function renderColdSite() {
     if (dayOption) {
       state.startWeekday = normalizeWeekday(dayOption.dataset.startDayValue);
       closeDayPicker();
-      renderAll();
+      renderAll({ scrollDetail: true });
       return;
     }
 
@@ -481,14 +550,14 @@ function renderColdSite() {
     const phaseButton = event.target.closest("[data-day]");
     if (phaseButton) {
       state.selectedDay = Number(phaseButton.dataset.day);
-      renderAll();
+      updateSelectedDayUi({ scrollTimeline: true, scrollDetail: true });
       return;
     }
 
     const audienceButton = event.target.closest("[data-audience-value]");
     if (audienceButton) {
       state.audience = audienceButton.dataset.audienceValue;
-      renderAll();
+      renderAll({ scrollDetail: true });
       return;
     }
 
@@ -498,13 +567,17 @@ function renderColdSite() {
       state.selectedSymptoms = state.selectedSymptoms.includes(id)
         ? state.selectedSymptoms.filter((item) => item !== id)
         : [...state.selectedSymptoms, id];
-      renderAll();
+      renderSymptoms();
+      renderMeds();
+      saveState(state);
       return;
     }
 
     if (event.target.closest("[data-clear-symptoms]")) {
       state.selectedSymptoms = [];
-      renderAll();
+      renderSymptoms();
+      renderMeds();
+      saveState(state);
       return;
     }
 
@@ -521,16 +594,20 @@ function renderColdSite() {
     if (event.target.closest("[data-reset-settings]")) {
       Object.assign(state, { ...defaultState, startWeekday: null });
       closeDayPicker();
-      renderAll();
+      renderAll({ scrollDetail: true });
       return;
     }
 
     if (event.target.closest("[data-reset-site]")) {
       Object.assign(state, { ...defaultState, startWeekday: null });
       closeDayPicker();
-      renderAll();
+      renderAll({ scrollDetail: true });
     }
   });
+
+  if (detail) {
+    detail.addEventListener("scroll", handleDetailScroll, { passive: true });
+  }
 
   if (resetButton) {
     resetButton.addEventListener("keydown", (event) => {
