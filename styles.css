@@ -384,13 +384,78 @@ body:not(.has-start-day) .day-picker-pill {
 body:not(.has-start-day) .phase-date { display: none; }
 .phase-name { display: block; margin-top: 7px; font-weight: 950; line-height: 1.05; }
 .phase-short { display: block; margin-top: 5px; color: var(--muted); font-size: 0.88rem; line-height: 1.25; }
-.phase-contagion {
-  display: block;
-  margin-top: 8px;
-  color: rgba(98, 107, 118, 0.5);
-  font-size: 0.72rem;
-  font-weight: 760;
+.phase-signals {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
 }
+.signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(98, 107, 118, 0.45);
+  line-height: 1;
+}
+.signal-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+}
+.signal-icon-symptoms::before,
+.signal-icon-symptoms::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: currentColor;
+}
+.signal-icon-symptoms::before {
+  left: 6px;
+  top: 2px;
+  width: 3px;
+  height: 10px;
+}
+.signal-icon-symptoms::after {
+  left: 2px;
+  top: 6px;
+  width: 10px;
+  height: 3px;
+}
+.signal-icon-spread::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.signal-icon-spread::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.55;
+}
+.signal-dots {
+  display: inline-flex;
+  gap: 2px;
+}
+.signal-dots span {
+  width: 4px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.18;
+}
+.signal-dots span.is-on {
+  opacity: 0.72;
+}
+.signal-symptoms { color: rgba(227, 77, 70, 0.52); }
+.signal-spread { color: rgba(44, 123, 229, 0.48); }
 .phase-meter { display: none; }
 
 .detail-panel {
@@ -730,10 +795,10 @@ body:not(.has-start-day) .phase-date { display: none; }
     font-size: 0.8rem;
   }
 
-  .phase-contagion {
-    margin-top: 7px;
-    font-size: 0.66rem;
-  }
+  .phase-signals { gap: 6px; margin-top: 9px; }
+  .signal { gap: 3px; }
+  .signal-icon { width: 13px; height: 13px; }
+  .signal-dots span { width: 4px; height: 9px; }
 
   .detail-note {
     font-size: 0.98rem;

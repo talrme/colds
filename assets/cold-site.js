@@ -272,6 +272,48 @@ function dayLabel(day) {
   return day > 0 ? `Day +${day}` : `Day ${day}`;
 }
 
+function symptomLevel(severity) {
+  return Math.max(1, Math.min(4, Math.ceil(severity / 25)));
+}
+
+function contagionLevel(contagion) {
+  const levels = {
+    Possible: 1,
+    Rising: 2,
+    High: 3,
+    Peak: 4,
+    Moderate: 2,
+    Lower: 1,
+    "Very low": 1,
+  };
+  return levels[contagion] || 1;
+}
+
+function signalDots(level) {
+  return Array.from({ length: 4 }, (_, index) => (
+    `<span class="${index < level ? "is-on" : ""}"></span>`
+  )).join("");
+}
+
+function phaseSignals(phase) {
+  const symptoms = symptomLevel(phase.severity);
+  const spread = contagionLevel(phase.contagion);
+  const symptomTitle = `Symptom intensity: ${symptoms} of 4`;
+  const spreadTitle = `Contagiousness: ${phase.contagion}, ${spread} of 4`;
+  return `
+    <span class="phase-signals" aria-label="${symptomTitle}. ${spreadTitle}.">
+      <span class="signal signal-symptoms" title="${symptomTitle}">
+        <span class="signal-icon signal-icon-symptoms" aria-hidden="true"></span>
+        <span class="signal-dots" aria-hidden="true">${signalDots(symptoms)}</span>
+      </span>
+      <span class="signal signal-spread" title="${spreadTitle}">
+        <span class="signal-icon signal-icon-spread" aria-hidden="true"></span>
+        <span class="signal-dots" aria-hidden="true">${signalDots(spread)}</span>
+      </span>
+    </span>
+  `;
+}
+
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
@@ -344,7 +386,7 @@ function renderColdSite() {
           <span class="phase-date">${weekday ? weekday.short : ""}</span>
           <span class="phase-name">${phase.name}</span>
           <span class="phase-short">${phase.short}</span>
-          <span class="phase-contagion">Spread: ${phase.contagion}</span>
+          ${phaseSignals(phase)}
           <span class="phase-meter" aria-hidden="true"><span style="width: ${phase.severity}%"></span></span>
         </button>
       `;
