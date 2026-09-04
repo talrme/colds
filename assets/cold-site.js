@@ -15,6 +15,7 @@ const phases = [
     name: "Quiet incubation",
     short: "Probably nothing yet",
     severity: 8,
+    contagion: "Possible",
     symptoms: ["No obvious symptoms", "Maybe a faint tired feeling", "Normal-looking life"],
     notes: "This is the sneaky part. If there was an exposure, symptoms may not have shown up yet.",
     adult: ["Sleep, fluids, and hand washing are the whole plan.", "No cold medicine is usually useful before symptoms."],
@@ -25,6 +26,7 @@ const phases = [
     name: "Something maybe?",
     short: "A tiny wobble",
     severity: 15,
+    contagion: "Rising",
     symptoms: ["A little tired", "Maybe dry throat", "Maybe absolutely nothing"],
     notes: "Some colds announce themselves politely. Some walk in carrying drums.",
     adult: ["Prioritize sleep and hydration.", "Consider zinc only if you already tolerate it and can start early."],
@@ -35,6 +37,7 @@ const phases = [
     name: "Scratchy throat day",
     short: "The first real sign",
     severity: 30,
+    contagion: "High",
     symptoms: ["Scratchy or sore throat", "Mild fatigue", "Maybe sneezing"],
     notes: "For this site, Day 0 is the day the sore throat started. Everything else maps from there.",
     adult: ["Warm liquids, lozenges, honey, or acetaminophen/ibuprofen if sore.", "Check labels so you do not double up on acetaminophen."],
@@ -45,6 +48,7 @@ const phases = [
     name: "Throat plus nose",
     short: "The cold is logging in",
     severity: 42,
+    contagion: "Peak",
     symptoms: ["Sore throat", "Sneezing", "Runny nose", "Tiredness"],
     notes: "This is often when it becomes clear it is not just dry air or bad vibes.",
     adult: ["Saline spray or rinse can help nasal symptoms.", "Acetaminophen or ibuprofen can help fever, aches, or throat pain."],
@@ -55,6 +59,7 @@ const phases = [
     name: "Peak begins",
     short: "Nose takes the wheel",
     severity: 70,
+    contagion: "Peak",
     symptoms: ["Runny nose", "Congestion", "Sneezing", "Cough may start"],
     notes: "CDC notes cold symptoms often peak around days 2 to 3 after infection.",
     adult: ["Pseudoephedrine may help congestion if it is safe for you.", "Dextromethorphan may help a dry cough; guaifenesin may help loosen mucus."],
@@ -65,6 +70,7 @@ const phases = [
     name: "Peak nonsense",
     short: "Maximum tissues",
     severity: 92,
+    contagion: "High",
     symptoms: ["Congestion", "Runny nose", "Cough", "Low-grade fever or aches"],
     notes: "The goal is comfort and sleep. The cold is viral, so antibiotics do not help a routine cold.",
     adult: ["Pain relievers for fever/aches; saline, steam, or humidifier for congestion.", "Avoid taking multiple combo products with the same active ingredient."],
@@ -75,6 +81,7 @@ const phases = [
     name: "Still loud",
     short: "Cough moves in",
     severity: 85,
+    contagion: "Moderate",
     symptoms: ["Congestion", "Cough", "Post-nasal drip", "Tiredness"],
     notes: "This is a good day for low expectations and high-quality soup.",
     adult: ["Honey or lozenges can soothe cough/throat.", "Guaifenesin plus fluids may help if mucus feels stuck."],
@@ -85,6 +92,7 @@ const phases = [
     name: "Turning the corner",
     short: "Less intense, still annoying",
     severity: 62,
+    contagion: "Moderate",
     symptoms: ["Cough", "Congestion", "Hoarse voice", "Better energy"],
     notes: "If things are easing, that is the pattern you want. If fever or breathing issues show up, pay attention.",
     adult: ["Keep treating the symptom that bothers you most.", "Stop medicines you do not need anymore."],
@@ -95,6 +103,7 @@ const phases = [
     name: "The fake ending",
     short: "Almost better-ish",
     severity: 48,
+    contagion: "Lower",
     symptoms: ["Lingering cough", "Less congestion", "Tired at weird times"],
     notes: "The cold may feel mostly done, then remind you it has a small unfinished agenda.",
     adult: ["Sleep, fluids, and patience are doing more than it feels like.", "Consider a cough suppressant only if cough is keeping you from sleeping."],
@@ -105,6 +114,7 @@ const phases = [
     name: "One-week checkpoint",
     short: "The song was right",
     severity: 35,
+    contagion: "Lower",
     symptoms: ["Mild cough", "Residual stuffiness", "Energy returning"],
     notes: "Many colds are mostly better by around a week, though cough can hang around longer.",
     adult: ["Back off meds as symptoms fade.", "If you are worsening instead of improving, reassess."],
@@ -115,6 +125,7 @@ const phases = [
     name: "Cleanup crew",
     short: "Mostly normal",
     severity: 22,
+    contagion: "Very low",
     symptoms: ["Occasional cough", "Nose less dramatic", "Energy mostly back"],
     notes: "This is often mostly cleanup. Keep an eye out for symptoms that return after improving.",
     adult: ["No need to keep taking medication out of habit.", "Saline, fluids, and rest still help."],
@@ -125,6 +136,7 @@ const phases = [
     name: "Residual cough club",
     short: "Annoying encore",
     severity: 18,
+    contagion: "Very low",
     symptoms: ["Lingering cough", "Throat tickle", "Mostly better"],
     notes: "A lingering cough can happen, but the overall direction should be better.",
     adult: ["Honey/lozenges or warm drinks can help a tickle.", "Seek care for trouble breathing, dehydration, or fever lasting more than 4 days."],
@@ -135,6 +147,7 @@ const phases = [
     name: "Should be improving",
     short: "Red flag checkpoint",
     severity: 12,
+    contagion: "Very low",
     symptoms: ["Mostly resolved", "Maybe cough", "Should not be clearly worsening"],
     notes: "CDC suggests seeking medical care if symptoms last more than 10 days without getting better.",
     adult: ["If symptoms are not improving, or they improve then worsen, consider medical care.", "Test for COVID/flu when relevant, especially if high-risk."],
@@ -212,6 +225,7 @@ const medGuidance = {
 const sourceLinks = [
   { label: "CDC: Manage Common Cold", href: "https://www.cdc.gov/common-cold/treatment/index.html" },
   { label: "CDC: About Common Cold", href: "https://www.cdc.gov/common-cold/about/" },
+  { label: "MedlinePlus: Common cold", href: "https://medlineplus.gov/ency/article/000678.htm" },
   { label: "FDA: Kids cough and cold medicines", href: "https://www.fda.gov/consumers/consumer-updates/should-you-give-kids-medicine-coughs-and-colds" },
   { label: "HealthyChildren/AAP: Coughs and colds", href: "https://www.healthychildren.org/english/health-issues/conditions/chest-lungs/pages/coughs-and-colds-medicines-or-home-remedies.aspx" },
 ];
@@ -330,6 +344,7 @@ function renderColdSite() {
           <span class="phase-date">${weekday ? weekday.short : ""}</span>
           <span class="phase-name">${phase.name}</span>
           <span class="phase-short">${phase.short}</span>
+          <span class="phase-contagion">Spread: ${phase.contagion}</span>
           <span class="phase-meter" aria-hidden="true"><span style="width: ${phase.severity}%"></span></span>
         </button>
       `;
@@ -361,6 +376,7 @@ function renderColdSite() {
             <div>
               <p class="eyebrow">${dayLabel(phase.day)}${weekday ? ` · ${weekday.long}` : ""}</p>
               <h2>${phase.name}</h2>
+              <p class="detail-contagion">Contagiousness: ${phase.contagion}</p>
             </div>
             <span class="detail-pill">${phase.short}</span>
           </div>

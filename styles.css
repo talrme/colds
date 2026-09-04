@@ -384,6 +384,13 @@ body:not(.has-start-day) .day-picker-pill {
 body:not(.has-start-day) .phase-date { display: none; }
 .phase-name { display: block; margin-top: 7px; font-weight: 950; line-height: 1.05; }
 .phase-short { display: block; margin-top: 5px; color: var(--muted); font-size: 0.88rem; line-height: 1.25; }
+.phase-contagion {
+  display: block;
+  margin-top: 8px;
+  color: rgba(98, 107, 118, 0.5);
+  font-size: 0.72rem;
+  font-weight: 760;
+}
 .phase-meter { display: none; }
 
 .detail-panel {
@@ -433,6 +440,12 @@ body:not(.has-start-day) .phase-date { display: none; }
 }
 
 .detail-note { color: var(--muted); line-height: 1.55; font-size: 1.05rem; }
+.detail-contagion {
+  margin: 8px 0 0;
+  color: rgba(98, 107, 118, 0.6);
+  font-size: 0.9rem;
+  font-weight: 760;
+}
 .detail-grid,
 .med-list {
   display: grid;
@@ -717,8 +730,17 @@ body:not(.has-start-day) .phase-date { display: none; }
     font-size: 0.8rem;
   }
 
+  .phase-contagion {
+    margin-top: 7px;
+    font-size: 0.66rem;
+  }
+
   .detail-note {
     font-size: 0.98rem;
+  }
+
+  .detail-contagion {
+    font-size: 0.82rem;
   }
 
   .detail-panel {
