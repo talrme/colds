@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colds - Quiet Clinical</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <button type="button" class="wordmark" data-reset-site aria-label="Reset Colds site">Colds</button>
+      <div class="top-actions">
+        <label>
+          <span>Sore throat started</span>
+          <input type="date" data-start-date>
+        </label>
+        <div class="toggle-row" data-audience-toggle>
+          <button type="button" data-audience-value="adult">Adults</button>
+          <button type="button" data-audience-value="kid">Kids</button>
+        </div>
+        <button type="button" data-open-settings>Settings</button>
+      </div>
+    </header>
+
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Simple cold tracker</p>
+        <h1>Colds Last for a Week</h1>
+        <p>Symptom timing, active ingredient reminders, and a small amount of reassurance for the part where the tissue box becomes infrastructure.</p>
+      </div>
+      <section class="audio-card" aria-label="Colds Last for a Week song">
+        <img src="../assets/colds-last-for-a-week.jpg" alt="Cover art for Colds Last for a Week">
+        <div>
+          <p class="eyebrow">Optional audio</p>
+          <h2>Colds Last for a Week</h2>
+          <button type="button" data-audio-play aria-label="Play Colds Last for a Week">Play</button>
+          <input type="range" data-audio-progress value="0" min="0" max="100" step="0.1" aria-label="Song progress">
+          <p data-audio-time>0:00 / 0:00</p>
+        </div>
+        <audio data-audio preload="metadata" src="../assets/colds-last-for-a-week.mp3"></audio>
+      </section>
+    </section>
+
+    <section class="timeline-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow" data-audience-label>Adult guidance</p>
+          <h2>Timeline</h2>
+        </div>
+        <p data-selected-day>Day 0</p>
+      </div>
+      <div class="timeline" data-timeline></div>
+    </section>
+
+    <section class="detail-panel" data-detail></section>
+
+    <section class="medication-layout">
+      <div class="symptom-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Filter</p>
+            <h2>Symptoms</h2>
+          </div>
+          <button type="button" data-clear-symptoms>Clear</button>
+        </div>
+        <div class="symptoms" data-symptom-grid></div>
+      </div>
+      <div class="med-list" data-med-list></div>
+    </section>
+
+    <section class="sources" data-sources>
+      <p class="eyebrow">Sources</p>
+      <p>For routine colds, the goal is symptom relief. Antibiotics do not help viral colds. Seek care for trouble breathing, dehydration, fever longer than 4 days, worsening after improvement, or symptoms lasting more than 10 days without getting better.</p>
+      <nav data-source-list></nav>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" data-settings-backdrop hidden></div>
+  <section class="settings-modal" data-settings-modal hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="settings-panel">
+      <header>
+        <div>
+          <p class="eyebrow">Colds</p>
+          <h2 id="settings-title">Settings</h2>
+        </div>
+        <button type="button" data-close-settings aria-label="Close settings">×</button>
+      </header>
+      <div class="settings-summary" data-settings-summary></div>
+      <label><span>Remember date</span><input type="checkbox" data-setting="rememberDate"></label>
+      <label><span>Compact timeline</span><input type="checkbox" data-setting="compactMode"></label>
+      <label><span>Show sources</span><input type="checkbox" data-setting="showSources"></label>
+      <label><span>Reduce motion</span><input type="checkbox" data-setting="reduceMotion"></label>
+      <button type="button" data-reset-settings>Reset site</button>
+    </div>
+  </section>
+  <script src="../assets/cold-site.js"></script>
+</body>
+</html>

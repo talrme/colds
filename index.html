@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colds Last for a Week</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172238;
+      --muted: #667085;
+      --paper: #fff8ef;
+      --panel: rgba(255, 255, 255, 0.86);
+      --line: rgba(23, 34, 56, 0.12);
+      --teal: #2d8580;
+      --coral: #e98266;
+      --gold: #f5bc66;
+      --shadow: 0 18px 46px rgba(23, 34, 56, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 16%, rgba(233, 130, 102, 0.25), transparent 30%),
+        radial-gradient(circle at 86% 10%, rgba(45, 133, 128, 0.24), transparent 28%),
+        linear-gradient(180deg, #fff8ef, #eef8f4 70%, #f6ede4);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    main {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 44px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .concept-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      min-height: 300px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 190px;
+      gap: 24px;
+      align-items: end;
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--teal);
+      font-size: 0.75rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1,
+    h2,
+    p {
+      overflow-wrap: anywhere;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      font-size: clamp(4rem, 12vw, 8rem);
+    }
+
+    .hero p:last-child {
+      max-width: 620px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.22rem);
+      line-height: 1.48;
+    }
+
+    .hero img {
+      width: 190px;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 14px 30px rgba(23, 34, 56, 0.14);
+      transform: rotate(2deg);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .concept-card {
+      min-height: 210px;
+      padding: 16px;
+      color: inherit;
+      text-decoration: none;
+      display: grid;
+      align-content: space-between;
+      transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+    }
+
+    .concept-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(45, 133, 128, 0.42);
+      box-shadow: 0 22px 48px rgba(23, 34, 56, 0.18);
+    }
+
+    .concept-card span {
+      color: var(--coral);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .concept-card h2 {
+      margin-top: 8px;
+      font-size: 1.45rem;
+    }
+
+    .concept-card p {
+      margin: 16px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 920px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      main {
+        width: min(100% - 22px, 540px);
+        padding-top: 18px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .hero img {
+        width: min(100%, 220px);
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Five staging concepts</p>
+        <h1>Colds Last for a Week</h1>
+        <p>Pick a direction for the cold timeline site. Each version includes adult and kid guidance, a sore-throat-start date, settings, and the song.</p>
+      </div>
+      <img src="assets/colds-last-for-a-week.jpg" alt="Cover art for Colds Last for a Week">
+    </section>
+
+    <section class="grid" aria-label="Staging concepts">
+      <a class="concept-card" href="staging_1/">
+        <div>
+          <span>Option 1</span>
+          <h2>Cozy Forecast</h2>
+        </div>
+        <p>Warm, soft, and sick-day friendly.</p>
+      </a>
+      <a class="concept-card" href="staging_2/">
+        <div>
+          <span>Option 2</span>
+          <h2>Symptom Subway</h2>
+        </div>
+        <p>A route-map timeline with days as stops.</p>
+      </a>
+      <a class="concept-card" href="staging_3/">
+        <div>
+          <span>Option 3</span>
+          <h2>Medicine Cabinet</h2>
+        </div>
+        <p>Most focused on symptoms and active ingredients.</p>
+      </a>
+      <a class="concept-card" href="staging_4/">
+        <div>
+          <span>Option 4</span>
+          <h2>Sick Day Radio</h2>
+        </div>
+        <p>Song-forward, playful, and a little goofy.</p>
+      </a>
+      <a class="concept-card" href="staging_5/">
+        <div>
+          <span>Option 5</span>
+          <h2>Quiet Clinical</h2>
+        </div>
+        <p>Cleanest and most practical.</p>
+      </a>
+    </section>
+
+    <p class="footer-note">This is a staging chooser until one concept gets promoted to the final site.</p>
+  </main>
+</body>
+</html>

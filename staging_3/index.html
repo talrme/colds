@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colds - Medicine Cabinet</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <aside class="cabinet-rail">
+      <button type="button" class="brand" data-reset-site aria-label="Reset cold cabinet">
+        <span>Cold Cabinet</span>
+        <strong>Colds Last for a Week</strong>
+      </button>
+      <section class="mini-player">
+        <img src="../assets/colds-last-for-a-week.jpg" alt="Cover art for Colds Last for a Week">
+        <p class="eyebrow">The song</p>
+        <h2>Colds Last for a Week</h2>
+        <button type="button" data-audio-play aria-label="Play Colds Last for a Week">Play</button>
+        <input type="range" data-audio-progress value="0" min="0" max="100" step="0.1" aria-label="Song progress">
+        <p data-audio-time>0:00 / 0:00</p>
+        <audio data-audio preload="metadata" src="../assets/colds-last-for-a-week.mp3"></audio>
+      </section>
+      <button type="button" class="settings-button" data-open-settings>Settings</button>
+    </aside>
+
+    <section class="workspace">
+      <section class="top-controls">
+        <label>
+          <span>Sore throat started</span>
+          <input type="date" data-start-date>
+        </label>
+        <div class="toggle-row" data-audience-toggle>
+          <button type="button" data-audience-value="adult">Adult</button>
+          <button type="button" data-audience-value="kid">Kid</button>
+        </div>
+      </section>
+
+      <section class="symptom-picker">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow" data-audience-label>Adult guidance</p>
+            <h1>What are we treating?</h1>
+          </div>
+          <button type="button" data-clear-symptoms>Clear</button>
+        </div>
+        <div class="symptoms" data-symptom-grid></div>
+      </section>
+
+      <section class="med-list" data-med-list></section>
+
+      <section class="timeline-card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Timeline</p>
+            <h2>Expected cold arc</h2>
+          </div>
+          <p data-selected-day>Day 0</p>
+        </div>
+        <div class="timeline" data-timeline></div>
+      </section>
+
+      <section class="detail-panel" data-detail></section>
+
+      <section class="sources" data-sources>
+        <p class="eyebrow">Label reader energy</p>
+        <p>Medication names are active ingredients, not shopping instructions. Check Drug Facts labels and ask a clinician/pharmacist if pregnant, high-risk, using other medicines, or dealing with severe symptoms.</p>
+        <nav data-source-list></nav>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" data-settings-backdrop hidden></div>
+  <section class="settings-modal" data-settings-modal hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="settings-panel">
+      <header>
+        <div>
+          <p class="eyebrow">Cold Cabinet</p>
+          <h2 id="settings-title">Settings</h2>
+        </div>
+        <button type="button" data-close-settings aria-label="Close settings">×</button>
+      </header>
+      <div class="settings-summary" data-settings-summary></div>
+      <label><span>Remember date</span><input type="checkbox" data-setting="rememberDate"></label>
+      <label><span>Compact timeline</span><input type="checkbox" data-setting="compactMode"></label>
+      <label><span>Show sources</span><input type="checkbox" data-setting="showSources"></label>
+      <label><span>Reduce motion</span><input type="checkbox" data-setting="reduceMotion"></label>
+      <button type="button" data-reset-settings>Reset site</button>
+    </div>
+  </section>
+  <script src="../assets/cold-site.js"></script>
+</body>
+</html>
