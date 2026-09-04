@@ -415,6 +415,20 @@ function renderColdSite() {
     renderSources();
     renderSettingsSummary();
     saveState(state);
+    scrollSelectedPhaseIntoView();
+  }
+
+  function scrollSelectedPhaseIntoView() {
+    if (!timeline || window.matchMedia("(min-width: 821px)").matches) return;
+    const selected = timeline.querySelector(".phase-tile.is-selected");
+    if (!selected) return;
+    window.requestAnimationFrame(() => {
+      const targetLeft = selected.offsetLeft - (timeline.clientWidth - selected.offsetWidth) / 2;
+      timeline.scrollTo({
+        left: Math.max(0, targetLeft),
+        behavior: state.reduceMotion ? "auto" : "smooth",
+      });
+    });
   }
 
   document.addEventListener("click", (event) => {

@@ -12,6 +12,12 @@
 }
 
 * { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -22,10 +28,17 @@ body {
     var(--bg);
   background-size: 46px 46px;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
+
+body.is-modal-open {
+  overflow: hidden;
+}
+
 button, input, select { font: inherit; }
 button { cursor: pointer; color: inherit; }
 img { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
 
 .site-shell {
   width: min(1180px, calc(100% - 28px));
@@ -49,6 +62,7 @@ img { display: block; max-width: 100%; }
 .detail-panel,
 .medicine-panel,
 .sources {
+  min-width: 0;
   border: 2px solid var(--ink);
   border-radius: 8px;
   background: var(--paper);
@@ -59,6 +73,7 @@ img { display: block; max-width: 100%; }
   min-height: 210px;
   padding: 24px;
   text-align: left;
+  overflow: hidden;
 }
 .title-button span {
   display: inline-block;
@@ -152,7 +167,8 @@ img { display: block; max-width: 100%; }
 }
 .song-strip img { width: 72px; border-radius: 8px; }
 .song-strip h2 { margin: 0; font-size: 1.25rem; }
-.song-strip p { margin: 0; }
+.song-strip p { margin: 0; color: var(--muted); }
+.song-strip > div { min-width: 0; }
 [data-audio-progress] { width: 100%; accent-color: var(--red); }
 
 .eyebrow {
@@ -191,18 +207,27 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
 
 .timeline {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: grid;
   grid-template-columns: repeat(13, minmax(120px, 1fr));
   gap: 14px;
   overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
   padding: 20px 0 10px;
+  scroll-padding-inline: 14px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 .timeline::before {
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
+  right: auto;
   top: 75px;
+  width: max(100%, calc(13 * 120px + 12 * 14px));
   height: 12px;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--green), var(--yellow), var(--red), var(--blue));
@@ -216,6 +241,8 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
   border: 2px solid var(--ink);
   border-radius: 8px;
   background: #fff;
+  scroll-snap-align: center;
+  touch-action: manipulation;
 }
 .phase-tile::before {
   content: "";
@@ -285,6 +312,8 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
 }
 .settings-panel {
   width: min(470px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
   padding: 18px;
   display: grid;
   gap: 12px;
@@ -309,6 +338,7 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
 .settings-panel label {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   padding: 10px;
   border: 2px solid var(--line);
@@ -321,11 +351,281 @@ h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); }
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { transition: none !important; animation: none !important; }
 
 @media (max-width: 820px) {
-  .hero { grid-template-columns: 1fr; }
-  .route-control { min-width: 0; }
-  .song-strip { grid-template-columns: 60px 1fr auto; }
+  body {
+    background-size: 32px 32px;
+  }
+
+  .site-shell {
+    width: min(100% - 18px, 560px);
+    padding: 10px 0 28px;
+    gap: 10px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .title-button,
+  .route-control,
+  .song-strip,
+  .map-section,
+  .detail-panel,
+  .medicine-panel,
+  .sources {
+    border-width: 1.5px;
+    box-shadow: 4px 4px 0 rgba(21, 25, 31, 0.08);
+  }
+
+  .title-button {
+    min-height: 142px;
+    padding: 16px;
+  }
+
+  .title-button span {
+    margin-bottom: 9px;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+  }
+
+  .title-button strong {
+    font-size: clamp(2.8rem, 17vw, 4.8rem);
+    line-height: 0.86;
+  }
+
+  .route-control {
+    min-width: 0;
+    padding: 12px;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .route-control label {
+    font-size: 0.68rem;
+  }
+
+  .route-control select {
+    min-height: 50px;
+    font-size: 1.08rem;
+  }
+
+  .toggle-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+
+  .toggle-row button,
+  [data-open-settings],
+  [data-audio-play],
+  [data-clear-symptoms],
+  [data-reset-settings] {
+    min-height: 46px;
+    border-width: 1.5px;
+  }
+
+  .song-strip {
+    grid-template-columns: 54px minmax(0, 1fr) 72px;
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .song-strip img {
+    width: 54px;
+    align-self: start;
+  }
+
+  .song-strip h2 {
+    font-size: 1rem;
+    line-height: 1.05;
+  }
+
+  .song-strip .eyebrow {
+    margin-bottom: 4px;
+    font-size: 0.66rem;
+  }
+
   .song-strip [data-audio-progress],
-  .song-strip [data-audio-time] { grid-column: 2 / -1; }
-  .detail-grid, .med-list { grid-template-columns: 1fr; }
-  .section-heading, .detail-heading { display: grid; }
+  .song-strip [data-audio-time] {
+    grid-column: 1 / -1;
+  }
+
+  .song-strip [data-audio-time] {
+    font-size: 0.76rem;
+  }
+
+  .map-section,
+  .detail-panel,
+  .medicine-panel,
+  .sources {
+    padding: 14px;
+  }
+
+  .section-heading,
+  .detail-heading {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .section-heading h1 {
+    font-size: clamp(2rem, 11vw, 3.2rem);
+  }
+
+  .section-heading h2,
+  .detail-heading h2 {
+    font-size: clamp(1.6rem, 8vw, 2.4rem);
+  }
+
+  .section-heading > p,
+  .detail-pill {
+    width: fit-content;
+    padding: 7px 10px;
+    border-width: 1.5px;
+  }
+
+  .timeline {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(108px, 38vw);
+    gap: 10px;
+    margin: 0 -6px;
+    padding: 16px 6px 14px;
+    scroll-snap-type: x proximity;
+    contain: layout paint;
+  }
+
+  .timeline::before {
+    top: 66px;
+    width: max(100%, calc(13 * 38vw + 12 * 10px));
+    height: 10px;
+  }
+
+  .phase-tile {
+    min-height: 140px;
+    padding: 10px;
+    border-width: 1.5px;
+  }
+
+  .phase-tile::before {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 12px;
+    border-width: 2.5px;
+  }
+
+  .phase-day {
+    font-size: 0.96rem;
+  }
+
+  .phase-date {
+    font-size: 0.94rem;
+  }
+
+  .phase-name {
+    font-size: 0.95rem;
+  }
+
+  .phase-short {
+    font-size: 0.8rem;
+  }
+
+  .detail-note {
+    font-size: 0.98rem;
+  }
+
+  .detail-grid,
+  .med-list {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid section,
+  .med-card {
+    padding: 12px;
+    border-width: 1.5px;
+  }
+
+  .detail-grid ul {
+    margin: 10px 0 0;
+    padding-left: 1.05rem;
+  }
+
+  .symptoms {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .symptom-chip {
+    min-height: 44px;
+    padding: 0 9px;
+    border-width: 1.5px;
+    line-height: 1.12;
+  }
+
+  .med-card h3 {
+    font-size: 1.05rem;
+  }
+
+  [data-source-list] {
+    display: grid;
+    gap: 8px;
+  }
+
+  [data-source-list] a {
+    display: block;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    text-decoration: none;
+  }
+
+  .settings-modal {
+    align-items: end;
+    padding: 10px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .settings-panel {
+    width: 100%;
+    max-height: min(680px, calc(100dvh - 20px));
+    border-radius: 8px 8px 0 0;
+    border-width: 1.5px;
+    padding: 16px;
+  }
+
+  .settings-panel header button {
+    border-width: 1.5px;
+  }
+
+  .settings-summary div,
+  .settings-panel label {
+    border-width: 1.5px;
+  }
+}
+
+@media (max-width: 430px) {
+  .site-shell {
+    width: min(100% - 14px, 430px);
+  }
+
+  .song-strip {
+    grid-template-columns: 50px minmax(0, 1fr) 64px;
+  }
+
+  .song-strip img {
+    width: 50px;
+  }
+
+  .timeline {
+    grid-auto-columns: minmax(104px, 44vw);
+  }
+
+  .timeline::before {
+    width: max(100%, calc(13 * 44vw + 12 * 10px));
+  }
+
+  .symptoms {
+    grid-template-columns: 1fr;
+  }
 }
